@@ -298,8 +298,8 @@ public:
     template<auto Data, typename... Property>
     meta_factory & data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
-            static const Type value{Data};
-            return this->data<&value>(str, std::forward<Property>(property)...);
+            static const auto value = Data;
+            meta_factory{}.data<&value>(str, std::forward<Property>(property)...);
         } else {
             auto * const type = internal::meta_info<Type>::resolve();
 
@@ -319,9 +319,9 @@ public:
             assert((!internal::meta_info<Type>::template data<Data>));
             internal::meta_info<Type>::template data<Data> = &node;
             type->data = &node;
-
-            return *this;
         }
+
+        return *this;
     }
 
     /**
