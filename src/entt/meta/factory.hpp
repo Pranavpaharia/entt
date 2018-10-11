@@ -300,18 +300,16 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
-            static const auto value = Data;
-
             static internal::meta_data_node node{
                 hashed_string{str},
                 type->data,
                 type,
-                properties<std::integral_constant<const Type *, &value>>(std::forward<Property>(property)...),
+                properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...),
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
-                &internal::setter<true, Type, &value>,
-                &internal::getter<Type, &value>
+                [](meta_handle, meta_any &) { return false; },
+                [](meta_handle) -> meta_any { return Data; }
             };
 
             assert(!duplicate(hashed_string{str}, node.next));
